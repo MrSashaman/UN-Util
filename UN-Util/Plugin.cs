@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Exiled.API.Features;
+﻿using Exiled.API.Features;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Server;
 using PlayerRoles;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UN_Util
 {
@@ -14,13 +15,23 @@ namespace UN_Util
         public override string Author => "mrSashaman";
         public override Version Version => new Version(0, 0, 1);
 
+        private readonly List<ItemType> rewards = new List<ItemType>()
+        {
+            ItemType.Medkit,
+            ItemType.Flashlight,
+            ItemType.Coin,
+            ItemType.KeycardJanitor
+        };
+
+        private readonly Random rnd = new Random();
+
         public override void OnEnabled()
         {
-            // Подписка на события
             Exiled.Events.Handlers.Server.WaitingForPlayers += Hello;
             Exiled.Events.Handlers.Player.Verified += PlayerVerified;
             Exiled.Events.Handlers.Player.Died += OnDead;
             Exiled.Events.Handlers.Server.RoundStarted += RoundStart;
+            Exiled.Events.Handlers.Player.FlippingCoin += ThanksCoin;
 
             base.OnEnabled();
         }
@@ -31,6 +42,7 @@ namespace UN_Util
             Exiled.Events.Handlers.Player.Verified -= PlayerVerified;
             Exiled.Events.Handlers.Player.Died -= OnDead;
             Exiled.Events.Handlers.Server.RoundStarted -= RoundStart;
+            Exiled.Events.Handlers.Player.FlippingCoin -= ThanksCoin;
 
             base.OnDisabled();
         }
@@ -44,7 +56,7 @@ namespace UN_Util
 
         private void PlayerVerified(VerifiedEventArgs ev)
         {
-            ev.Player.Broadcast(10, "Welcome " + ev.Player.Nickname + "!");
+            ev.Player.Broadcast(4, "Привет " + ev.Player.Nickname + "!");
         }
 
         private void OnDead(DiedEventArgs ev)
@@ -52,18 +64,45 @@ namespace UN_Util
             ev.Player.ShowHint("Ты умер :(");
         }
 
+        private void ThanksCoin(FlippingCoinEventArgs ev)
+        {
+            ev.IsAllowed = false;
+
+            var coin = ev.Player.Items.FirstOrDefault(i => i.Type == ItemType.Coin);
+            if (coin != null)
+                ev.Player.RemoveItem(coin);
+
+            int roll = rnd.Next(100);
+
+            if (roll < 10)
+            {
+                ev.Player.ApplyRandomEffect();
+                return;
+            }
+
+            if (roll < 40)
+            {
+                ev.Player.ShowHint("Ничего не произошло...", 3);
+                return;
+            }
+
+            ItemType reward = rewards[rnd.Next(rewards.Count)];
+            ev.Player.AddItem(reward);
+            ev.Player.ShowHint($"Вам выпало: {reward}", 3);
+        }
+
         private void RoundStart()
         {
-            List<Player> Dboys = new List<Player>();
+            List<Player> dBoys = new List<Player>();
+
             foreach (var player in Player.List)
                 if (player.Role == RoleTypeId.ClassD)
-                    Dboys.Add(player);
+                    dBoys.Add(player);
 
-            Random rnd = new Random();
-
-            foreach (var player in Dboys)
+            foreach (var player in dBoys)
             {
-                int roll = rnd.Next(0, 3);
+                int roll = rnd.Next(3);
+
                 if (roll == 0)
                     player.AddItem(ItemType.Flashlight);
                 else if (roll == 1)
