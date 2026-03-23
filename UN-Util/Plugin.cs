@@ -13,7 +13,7 @@ namespace UN_Util
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 0, 1);
+        public override Version Version => new Version(0, 0, 2);
 
         private readonly List<ItemType> rewards = new List<ItemType>()
         {
