@@ -8,6 +8,9 @@ namespace UN_Util
     [CommandHandler(typeof(ClientCommandHandler))]
     public class SuicideCommand : ICommand
     {
+
+        //Команда .suicide
+
         public string Command => "suicide";
         public string[] Aliases => new string[] { "selfkill" };
         public string Description => "Убить себя";
@@ -30,7 +33,7 @@ namespace UN_Util
                 return false;
             }
 
-            player.Kill(DamageType.Custom);
+            player.Kill("Суицид - не выход");
             player.ShowHint("Вы совершили самоубийство.", 5);
 
             response = "Вы убили себя.";
