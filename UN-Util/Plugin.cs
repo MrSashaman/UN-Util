@@ -197,7 +197,7 @@ namespace UN_Util
         private void SpawnChaos(Player player)
         {
             player.Role.Set(RoleTypeId.ChaosRifleman);
-            player.Broadcast(5, "Ты выбрал Chaos!");
+            player.Broadcast(5, "Ты выбрал Повставцев Хаоса!");
         }
 
 
