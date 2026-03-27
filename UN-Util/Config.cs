@@ -38,7 +38,9 @@ namespace UN_Util
             ItemType.Coin,
             ItemType.KeycardJanitor,
             ItemType.Adrenaline,
-            ItemType.GunFSP9
+            ItemType.GunFSP9,
+            ItemType.Adrenaline,
+            ItemType.Jailbird
         };
     }
 
