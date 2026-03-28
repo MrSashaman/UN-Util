@@ -67,14 +67,6 @@ Each use is a **risk**.
 
 ---
 
-## 🚧 In Development
-
-- Custom items  
-- New gameplay events  
-- Expanded respawn system  
-- Additional effects  
-
----
 
 > ⚠️ **Warning**  
 > This plugin is still in a frozen state. Bugs and unfinished features may occur.
