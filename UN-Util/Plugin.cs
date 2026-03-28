@@ -95,7 +95,7 @@ namespace UN_Util
 
         private void Hello()
         {
-            Log.Info("****WELCOME*****");
+            Log.Info("*****WELCOME*****");
             Log.Info("Dev Discord: https://discord.gg/5pBt7cj8B9 ");
             Log.Info("Version: " + Version);
         }
