@@ -2,6 +2,9 @@
 
 A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, randomness, and fun gameplay elements to your server.
 
+[Русская версия ReadME
+](https://github.com/MrSashaman/UN-Util/blob/master/RU_README.md)
+
 ---
 
 ## ✨ Features
