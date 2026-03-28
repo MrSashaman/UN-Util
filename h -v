@@ -1,0 +1,30 @@
+[33m0567398[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mUpdate[m[33m)[m HEAD@{0}: commit (merge): 0.1.2
+[33m014424e[m HEAD@{1}: checkout: moving from master to Update
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{2}: checkout: moving from Update to master
+[33m014424e[m HEAD@{3}: checkout: moving from master to Update
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{4}: reset: moving to HEAD
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{5}: checkout: moving from Update to master
+[33m014424e[m HEAD@{6}: reset: moving to HEAD
+[33m014424e[m HEAD@{7}: commit: 0.0.2
+[33me6f496e[m HEAD@{8}: checkout: moving from master to Update
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{9}: checkout: moving from Update to master
+[33me6f496e[m HEAD@{10}: reset: moving to HEAD
+[33me6f496e[m HEAD@{11}: checkout: moving from master to Update
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{12}: checkout: moving from Update to master
+[33me6f496e[m HEAD@{13}: reset: moving to HEAD
+[33me6f496e[m HEAD@{14}: reset: moving to HEAD
+[33me6f496e[m HEAD@{15}: commit: 0.0.1_min_abc
+[33m78d05b4[m HEAD@{16}: reset: moving to HEAD
+[33m78d05b4[m HEAD@{17}: commit (amend): 0.1.1
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{18}: checkout: moving from master to Update
+[33m225ee75[m[33m ([m[1;33mtag: [m[1;33m0.1.1[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/Update[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m HEAD@{19}: commit: 0.1.1
+[33mb7db807[m HEAD@{20}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33m2a07766[m[33m ([m[1;33mtag: [m[1;33mUpdate-0.1.0[m[33m)[m HEAD@{21}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'ort' strategy.
+[33mad29cf0[m HEAD@{22}: commit: Добавленно hack, роль предателя, обновлён config, прочие улучшения
+[33m578d818[m[33m ([m[1;33mtag: [m[1;33mUpdate-0.0.3[m[33m)[m HEAD@{23}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Merge made by the 'ort' strategy.
+[33m76aad7b[m HEAD@{24}: commit: Обновление 0.0.3
+[33m291eb29[m HEAD@{25}: commit: 0.0.2
+[33m6664002[m[33m ([m[1;33mtag: [m[1;33mUpdate-2[m[33m)[m HEAD@{26}: commit: Добавленно:
+[33mad820e3[m HEAD@{27}: pull --progress --no-edit --no-stat --recurse-submodules=no origin: Fast-forward
+[33mf5c21ca[m[33m ([m[1;33mtag: [m[1;33mUpdate[m[33m)[m HEAD@{28}: commit: Добавьте файлы проекта.
+[33mf22f4c5[m HEAD@{29}: commit (initial): Добавить .gitattributes, .gitignore и LICENSE.txt.
