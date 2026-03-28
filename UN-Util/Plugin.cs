@@ -26,7 +26,7 @@ namespace UN_Util
         public override string Prefix => "UN_Utils";
 
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 1, 1);
+        public override Version Version => new Version(0, 1, 2);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
@@ -34,6 +34,7 @@ namespace UN_Util
         private string traitorId;
         private bool traitorActive = false;
         public static Plugin Singleton;
+        public bool IsPluginEnabled { get; private set; }
 
         public override void OnEnabled()
         {
@@ -48,6 +49,7 @@ namespace UN_Util
             Exiled.Events.Handlers.Player.Hurting += OnHurting;
             Exiled.Events.Handlers.Player.Escaping += OnEscaping;
             Exiled.Events.Handlers.Scp096.AddingTarget += OnAddingTarget;
+            IsPluginEnabled = true;
 
             Exiled.Events.Handlers.Server.RespawningTeam += OnRespawningTeam;
             MapEvents.Decontaminating += OnDecontaminating;
@@ -57,6 +59,8 @@ namespace UN_Util
 
         public override void OnDisabled()
         {
+            IsPluginEnabled = false;
+
             Exiled.Events.Handlers.Server.WaitingForPlayers -= Hello;
             Exiled.Events.Handlers.Player.Verified -= PlayerVerified;
             Exiled.Events.Handlers.Player.Died -= OnDead;
@@ -146,6 +150,7 @@ namespace UN_Util
             var chaosCard = player.AddItem(ItemType.KeycardChaosInsurgency);
 
             player.Broadcast(10, "Выбери сторону:\nДержи карту в руках <color=red>10 секунд</color>");
+            player.Broadcast(10, "Выбери сторону:\nДержи карту в руках 10 секунд");
 
             choosingPlayers[player] = Timing.RunCoroutine(ChooseSide(player));
         }
@@ -198,6 +203,7 @@ namespace UN_Util
         {
             player.Role.Set(RoleTypeId.ChaosRifleman);
             player.Broadcast(5, "Ты выбрал Повставцев Хаоса!");
+            player.Broadcast(5, "Ты выбрал Chaos!");
         }
 
 
