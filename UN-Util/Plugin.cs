@@ -1,16 +1,12 @@
 ﻿using Exiled.API.Enums;
-using Exiled.API.Enums;
 using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp049;
-using Exiled.Events.EventArgs.Scp049;
 using Exiled.Events.EventArgs.Scp096;
 using Exiled.Events.EventArgs.Server;
 using MEC;
-using Exiled.Events.EventArgs.Scp096;
-
 using PlayerRoles;
 using System;
 using System.Collections.Generic;
@@ -24,34 +20,38 @@ namespace UN_Util
     {
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
-
         public override string Author => "mrSashaman";
         public override Version Version => new Version(0, 1, 2);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
+
         private Player traitor;
         private string traitorId;
         private bool traitorActive = false;
+
         public static Plugin Singleton;
         public bool IsPluginEnabled { get; private set; }
 
         public override void OnEnabled()
         {
             Singleton = this;
+            IsPluginEnabled = true;
+
             Exiled.Events.Handlers.Server.WaitingForPlayers += Hello;
             Exiled.Events.Handlers.Server.RoundEnded += OnRoundEnded;
+            Exiled.Events.Handlers.Server.RoundStarted += RoundStart;
+            Exiled.Events.Handlers.Server.RespawningTeam += OnRespawningTeam;
+
             Exiled.Events.Handlers.Player.Verified += PlayerVerified;
             Exiled.Events.Handlers.Player.Died += OnDead;
-            Exiled.Events.Handlers.Server.RoundStarted += RoundStart;
-            Exiled.Events.Handlers.Scp049.StartingRecall += OnStartingRecall;
             Exiled.Events.Handlers.Player.FlippingCoin += ThanksCoin;
             Exiled.Events.Handlers.Player.Hurting += OnHurting;
             Exiled.Events.Handlers.Player.Escaping += OnEscaping;
-            Exiled.Events.Handlers.Scp096.AddingTarget += OnAddingTarget;
-            IsPluginEnabled = true;
 
-            Exiled.Events.Handlers.Server.RespawningTeam += OnRespawningTeam;
+            Exiled.Events.Handlers.Scp049.StartingRecall += OnStartingRecall;
+            Exiled.Events.Handlers.Scp096.AddingTarget += OnAddingTarget;
+
             MapEvents.Decontaminating += OnDecontaminating;
 
             base.OnEnabled();
@@ -62,18 +62,20 @@ namespace UN_Util
             IsPluginEnabled = false;
 
             Exiled.Events.Handlers.Server.WaitingForPlayers -= Hello;
-            Exiled.Events.Handlers.Player.Verified -= PlayerVerified;
-            Exiled.Events.Handlers.Player.Died -= OnDead;
-            Exiled.Events.Handlers.Scp049.StartingRecall -= OnStartingRecall;
             Exiled.Events.Handlers.Server.RoundEnded -= OnRoundEnded;
             Exiled.Events.Handlers.Server.RoundStarted -= RoundStart;
+            Exiled.Events.Handlers.Server.RespawningTeam -= OnRespawningTeam;
+
+            Exiled.Events.Handlers.Player.Verified -= PlayerVerified;
+            Exiled.Events.Handlers.Player.Died -= OnDead;
             Exiled.Events.Handlers.Player.FlippingCoin -= ThanksCoin;
             Exiled.Events.Handlers.Player.Hurting -= OnHurting;
-            Exiled.Events.Handlers.Scp096.AddingTarget -= OnAddingTarget;
-            Exiled.Events.Handlers.Server.RespawningTeam -= OnRespawningTeam;
-            MapEvents.Decontaminating -= OnDecontaminating;
             Exiled.Events.Handlers.Player.Escaping -= OnEscaping;
 
+            Exiled.Events.Handlers.Scp049.StartingRecall -= OnStartingRecall;
+            Exiled.Events.Handlers.Scp096.AddingTarget -= OnAddingTarget;
+
+            MapEvents.Decontaminating -= OnDecontaminating;
 
             base.OnDisabled();
         }
@@ -96,21 +98,18 @@ namespace UN_Util
             ev.Player.ShowHint(Config.Messages.DeathHint);
             ev.Player.Broadcast(7, Config.Messages.DeathBroadcast);
         }
-        
+
+        private void OnAddingTarget(AddingTargetEventArgs ev)
+        {
+            ev.Target.ShowHint("Ты видел его лицо...");
+            ev.Player.ShowHint($"Новая цель: {ev.Target.Nickname}");
+        }
 
         private void OnStartingRecall(StartingRecallEventArgs ev)
-            {
-                var doctor = ev.Player;
-
-                var target = ev.Target;
-
-                doctor.ShowHint("Ты начинаешь оживлять игрока!");
-
-                if (target != null)
-                {
-                    target.ShowHint("Тебя пытаются оживить...");
-                }
-            }
+        {
+            ev.Player.ShowHint("Ты начинаешь оживлять игрока!");
+            ev.Target?.ShowHint("Тебя пытаются оживить...");
+        }
 
         private void OnRoundEnded(RoundEndedEventArgs ev)
         {
@@ -118,38 +117,22 @@ namespace UN_Util
             traitorId = null;
             traitor = null;
             traitorActive = false;
+
+            Log.Info("FF Включен");
         }
-
-
-        private void OnAddingTarget(AddingTargetEventArgs ev)
-            {
-                var scp096 = ev.Player;   
-                var target = ev.Target;   
-
-                target.ShowHint("Ты видел его лицо...");
-                scp096.ShowHint($"Новая цель: {target.Nickname}");
-            }
-
-
-
-        //ПОБЕГ ИГРОКА
-
-
 
         private void OnEscaping(EscapingEventArgs ev)
         {
             ev.IsAllowed = false;
 
-            Player player = ev.Player;
+            var player = ev.Player;
 
             player.Role.Set(RoleTypeId.Tutorial);
-
             player.ClearInventory();
 
-            var ntfCard = player.AddItem(ItemType.KeycardMTFPrivate);
-            var chaosCard = player.AddItem(ItemType.KeycardChaosInsurgency);
+            player.AddItem(ItemType.KeycardMTFPrivate);
+            player.AddItem(ItemType.KeycardChaosInsurgency);
 
-            player.Broadcast(10, "Выбери сторону:\nДержи карту в руках <color=red>10 секунд</color>");
             player.Broadcast(10, "Выбери сторону:\nДержи карту в руках 10 секунд");
 
             choosingPlayers[player] = Timing.RunCoroutine(ChooseSide(player));
@@ -179,19 +162,12 @@ namespace UN_Util
             }
 
             if (item.Type == ItemType.KeycardMTFPrivate)
-            {
                 SpawnNTF(player);
-            }
             else if (item.Type == ItemType.KeycardChaosInsurgency)
-            {
                 SpawnChaos(player);
-            }
             else
-            {
                 player.Broadcast(5, "Неверный предмет!");
-            }
         }
-
 
         private void SpawnNTF(Player player)
         {
@@ -202,28 +178,54 @@ namespace UN_Util
         private void SpawnChaos(Player player)
         {
             player.Role.Set(RoleTypeId.ChaosRifleman);
-            player.Broadcast(5, "Ты выбрал Повставцев Хаоса!");
             player.Broadcast(5, "Ты выбрал Chaos!");
         }
 
-
         public void OnDecontaminating(DecontaminatingEventArgs ev)
         {
-            Timing.CallDelayed(Config.Decontamination.CassieDelay, () =>
-            {
-                Exiled.API.Features.Cassie.Message(Config.Decontamination.CassieMessage, isNoisy: true);
-            });
+            Timing.CallDelayed(Config.Decontamination.CassieDelay,
+                () => Exiled.API.Features.Cassie.Message(Config.Decontamination.CassieMessage, true));
 
             Map.Broadcast(15, Config.Decontamination.Broadcast);
-
             Map.ChangeLightsColor(Color.red);
 
-            Timing.CallDelayed(Config.Decontamination.LightDuration, () =>
-            {
-                Map.ResetLightsColor();
-            });
+            Timing.CallDelayed(Config.Decontamination.LightDuration,
+                () => Map.ResetLightsColor());
         }
 
+        public void ForceTraitor(Player player, string team)
+        {
+            traitorId = player.UserId;
+            traitor = player;
+            traitorActive = false;
+
+            Timing.CallDelayed(0.5f, () =>
+            {
+                if (traitor == null || !traitor.IsAlive)
+                    return;
+
+                traitor.ClearInventory();
+
+                if (team == "ntf")
+                {
+                    traitor.Role.Set(RoleTypeId.NtfPrivate);
+                    traitor.AddItem(ItemType.GunAK);
+                    traitor.AddItem(ItemType.ArmorCombat);
+                    traitor.AddItem(ItemType.Medkit);
+                }
+                else if (team == "chaos")
+                {
+                    traitor.Role.Set(RoleTypeId.ChaosRifleman);
+                    traitor.AddItem(ItemType.GunCrossvec);
+                    traitor.AddItem(ItemType.ArmorHeavy);
+                    traitor.AddItem(ItemType.Medkit);
+                }
+
+                traitor.Broadcast(10, "<color=red>Ты предатель (принудительно)</color>");
+
+                Timing.RunCoroutine(TraitorTimer());
+            });
+        }
 
         private void ThanksCoin(FlippingCoinEventArgs ev)
         {
@@ -252,8 +254,6 @@ namespace UN_Util
                 var grenade = (ExplosiveGrenade)Item.Create(ItemType.GrenadeHE);
                 grenade.FuseTime = Config.Coin.GrenadeFuse;
                 grenade.SpawnActive(player.Position);
-
-                player.ShowHint("<color=red>ОЙ...</color>", 3);
                 return;
             }
 
@@ -266,29 +266,21 @@ namespace UN_Util
             if (roll < (current += Config.Coin.NegativeEffectChance))
             {
                 player.ApplyRandomEffect(EffectCategory.Negative);
-                player.ShowHint(Config.Messages.CoinBad, 3);
                 return;
             }
 
             if (roll < (current += Config.Coin.NothingChance))
-            {
-                player.ShowHint(Config.Messages.CoinNothing, 3);
                 return;
-            }
 
             if (roll < (current += Config.Coin.PositiveEffectChance))
             {
                 player.ApplyRandomEffect(EffectCategory.Positive);
-                player.ShowHint(Config.Messages.CoinGood, 3);
                 return;
             }
 
             var reward = Config.Coin.Rewards[rnd.Next(Config.Coin.Rewards.Count)];
             player.AddItem(reward);
-            player.ShowHint($"<color=yellow>Вам выпало: {reward}</color>", 3);
         }
-
-
 
         private void OnRespawningTeam(RespawningTeamEventArgs ev)
         {
@@ -306,63 +298,18 @@ namespace UN_Util
             Timing.CallDelayed(0.5f, () =>
             {
                 var pl = Player.Get(traitorId);
+                if (pl == null || !pl.IsAlive) return;
 
-                if (pl == null || !pl.IsAlive)
-                    return;
-
-                SetupTraitor(ev);
+                SetupTraitor();
             });
         }
 
-
-        public void ForceTraitor(Player player, string team)
-        {
-
-            traitorId = player.UserId;
-
-            traitor = player;
-            traitorActive = false;
-
-            Timing.CallDelayed(0.5f, () =>
-            {
-                if (traitor == null || !traitor.IsAlive)
-                    return;
-
-                traitor.ClearInventory();
-
-                if (team == "ntf")
-                {
-                    traitor.Role.Set(RoleTypeId.NtfPrivate);
-
-                    traitor.AddItem(ItemType.GunAK);
-                    traitor.AddItem(ItemType.ArmorCombat);
-                    traitor.AddItem(ItemType.Medkit);
-                }
-                else if (team == "chaos")
-                {
-                    traitor.Role.Set(RoleTypeId.ChaosRifleman);
-
-                    traitor.AddItem(ItemType.GunCrossvec);
-                    traitor.AddItem(ItemType.ArmorHeavy);
-                    traitor.AddItem(ItemType.Medkit);
-                }
-
-                traitor.Broadcast(10, "<color=red>Ты предатель (принудительно)</color>");
-
-                Timing.RunCoroutine(TraitorTimer());
-            });
-        }
-
-
-        private void SetupTraitor(RespawningTeamEventArgs ev)
+        private void SetupTraitor()
         {
             var pl = Player.Get(traitorId);
-
-            if (pl == null)
-                return;
+            if (pl == null) return;
 
             pl.Role.Set(RoleTypeId.ChaosRifleman);
-
             pl.ClearInventory();
 
             pl.AddItem(ItemType.GunAK);
@@ -391,29 +338,21 @@ namespace UN_Util
 
             traitorActive = true;
 
-            if (traitor != null)
-                traitor.Broadcast(5, "<color=green>Ты активирован. Действуй.</color>");
+            traitor?.Broadcast(5, "<color=green>Ты активирован. Действуй.</color>");
         }
 
         private void OnHurting(HurtingEventArgs ev)
         {
-            if (traitorId == null)
-                return;
+            if (traitorId == null) return;
 
-            bool isTraitorInvolved =
+            bool involved =
                 ev.Attacker?.UserId == traitorId ||
                 ev.Player?.UserId == traitorId;
 
-            if (!isTraitorInvolved)
-                return;
+            if (!involved) return;
 
             if (!traitorActive)
-            {
                 ev.IsAllowed = false;
-                return;
-            }
-
-            Log.Info("TRAITOR CAN DAMAGE NOW");
         }
 
         private void RoundStart()
@@ -421,17 +360,11 @@ namespace UN_Util
             foreach (var player in Player.List)
             {
                 if (player.Role == RoleTypeId.Scientist && Config.RoundStart.GiveScientistsGun)
-                {
                     player.AddItem(Config.RoundStart.ScientistGun);
-                }
 
                 if (player.Role == RoleTypeId.ClassD)
-                {
-                    var item = Config.RoundStart.ClassDItems[
-                        rnd.Next(Config.RoundStart.ClassDItems.Count)];
-
-                    player.AddItem(item);
-                }
+                    player.AddItem(Config.RoundStart.ClassDItems[
+                        rnd.Next(Config.RoundStart.ClassDItems.Count)]);
             }
         }
     }
