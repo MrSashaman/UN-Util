@@ -41,7 +41,7 @@ A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, 
 |----------|------------|
 | `.suicide` | Kill yourself |
 | `.hack` | “Hack” admin access |
-| `/status` | Check plugin status (admins only) |
+| `/un_st` | Check plugin status (admins only) |
 | `.res` | Respawn (Spectator only, first 5 minutes, includes cooldown) |
 
 ---
