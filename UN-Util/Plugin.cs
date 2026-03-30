@@ -24,7 +24,7 @@ namespace UN_Util
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 1, 3);
+        public override Version Version => new Version(0, 2, 0);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
@@ -32,6 +32,8 @@ namespace UN_Util
         private Player traitor;
         private string traitorId;
         private Locker anomalousLocker;
+        private List<Room> radiationRooms = new List<Room>();
+        private CoroutineHandle radiationCoroutine;
         private Room anomalousRoom;
         private readonly System.Random lockerRnd = new System.Random();
         private bool traitorActive = false;
@@ -95,9 +97,20 @@ namespace UN_Util
 
         private void Hello()
         {
-            Log.Info("*****WELCOME*****");
-            Log.Info("Dev Discord: https://discord.gg/5pBt7cj8B9 ");
+            Log.Info("Welcome to");
+            Log.Info(" ");
+
+            Log.Info("   __  ___   __    __  ______________ ");
+            Log.Info("  / / / / | / /   / / / /_  __/  _/ / ");
+            Log.Info(" / / / /  |/ /   / / / / / /  / // /  ");
+            Log.Info("/ /_/ / /|  /   / /_/ / / / _/ // /___");
+            Log.Info("\\____/_/ |_/____\\____/ /_/ /___/_____/");
+            Log.Info("          /_____/                     ");
+
+            Log.Info(" ");
             Log.Info("Version: " + Version);
+            Log.Info("Dev Discord: https://discord.gg/5pBt7cj8B9");
+            Log.Info(" ");
         }
 
 
@@ -122,6 +135,28 @@ namespace UN_Util
             anomalousLocker = lockers[lockerRnd.Next(lockers.Count)];
 
             Log.Info("Аномальный шкаф выбран!");
+
+
+
+
+            radiationRooms.Clear();
+
+            var targetRooms = Room.List.Where(r =>
+                r.Type == RoomType.HczArmory ||
+                r.Type == RoomType.EzIntercom ||
+                r.Type == RoomType.LczToilets 
+            ).ToList();
+
+            foreach (var radRoom in targetRooms)
+            {
+                if (rnd.Next(100) < 45)
+                {
+                    radiationRooms.Add(radRoom);
+                    radRoom.Color = Color.green;
+
+                    Log.Info($"[Radiation] Заражена комната: {radRoom.Type}");
+                }
+            }
         }
 
 
@@ -207,6 +242,43 @@ namespace UN_Util
             traitorActive = false;
 
             Log.Info("FF Включен");
+
+            radiationRooms.Clear();
+
+            if (radiationCoroutine.IsRunning)
+                Timing.KillCoroutines(radiationCoroutine);
+
+
+        }
+
+
+        private IEnumerator<float> RadiationLoop()
+        {
+            while (true)
+            {
+                foreach (var player in Player.List)
+                {
+                    if (player == null || !player.IsAlive)
+                        continue;
+
+                    if (player.Role.Team == Team.SCPs)
+                        player.ShowHint("Эта комната зараженна радиацией! Но у тебя имунитет");
+                        continue;
+
+                    var room = player.CurrentRoom;
+
+                    if (room == null)
+                        continue;
+
+                    if (radiationRooms.Contains(room))
+                    {
+                        player.EnableEffect(EffectType.Poisoned, 3f);
+                        player.ShowHint("<color=green>Радиация!</color>", 1f);
+                    }
+                }
+
+                yield return Timing.WaitForSeconds(2f);
+            }
         }
 
         private void OnEscaping(EscapingEventArgs ev)
@@ -442,6 +514,7 @@ namespace UN_Util
             traitor?.Broadcast(5, "<color=green>Ты активирован. Действуй.</color>");
         }
 
+
         private void OnHurting(HurtingEventArgs ev)
         {
             if (traitorId == null) return;
@@ -467,6 +540,11 @@ namespace UN_Util
                     player.AddItem(Config.RoundStart.ClassDItems[
                         rnd.Next(Config.RoundStart.ClassDItems.Count)]);
             }
+
+            if (radiationCoroutine.IsRunning)
+                Timing.KillCoroutines(radiationCoroutine);
+
+            radiationCoroutine = Timing.RunCoroutine(RadiationLoop());
         }
     }
 }
