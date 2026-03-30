@@ -8,7 +8,7 @@ namespace UN_Util
     {
         public bool IsEnabled { get; set; } = true;
         public bool Debug { get; set; } = false;
-
+        public EventSettings Events { get; set; } = new EventSettings();
         public CoinConfig Coin { get; set; } = new CoinConfig();
         public RoundStartConfig RoundStart { get; set; } = new RoundStartConfig();
         public MessageConfig Messages { get; set; } = new MessageConfig();
@@ -68,6 +68,49 @@ namespace UN_Util
         public string CoinNothing { get; set; } = "Ничего не произошло...";
     }
 
+    public class EventSettings
+    {
+        public AnomalousLockerSettings AnomalousLocker { get; set; } = new AnomalousLockerSettings();
+        public RadiationSettings Radiation { get; set; } = new RadiationSettings();
+        public TraitorSettings Traitor { get; set; } = new TraitorSettings();
+    }
+
+
+    public class AnomalousLockerSettings
+    {
+        public bool Enabled { get; set; } = true;
+
+        public int SeveredHandsChance { get; set; } = 10;
+        public int BlindChance { get; set; } = 10;
+        public int EnsnaredChance { get; set; } = 10;
+        public int PoisonChance { get; set; } = 10;
+        public int SlowChance { get; set; } = 10;
+
+        public float SeveredHandsDuration { get; set; } = 10f;
+        public float BlindDuration { get; set; } = 5f;
+        public float EnsnaredDuration { get; set; } = 6f;
+        public float PoisonDuration { get; set; } = 8f;
+        public float SlowDuration { get; set; } = 10f;
+    }
+
+
+    public class RadiationSettings
+    {
+        public bool Enabled { get; set; } = true;
+
+        public int Chance { get; set; } = 45;
+        public float Interval { get; set; } = 2f;
+        public float Duration { get; set; } = 3f;
+    }
+
+    public class TraitorSettings
+    {
+        public bool Enabled { get; set; } = true;
+
+        public int SpawnChance { get; set; } = 40;
+        public float ActivationTime { get; set; } = 60f;
+    }
+
     public class DecontaminationConfig
     {
         public string CassieMessage { get; set; } =
@@ -80,3 +123,4 @@ namespace UN_Util
         public float LightDuration { get; set; } = 10f;
     }
 }
+

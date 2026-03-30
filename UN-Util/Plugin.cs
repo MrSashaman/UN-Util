@@ -24,7 +24,7 @@ namespace UN_Util
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 2, 0);
+        public override Version Version => new Version(0, 2, 2);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
@@ -117,44 +117,42 @@ namespace UN_Util
         private void OnMapGenerated()
         {
             var room = Room.List.FirstOrDefault(r => r.Type == RoomType.LczGlassBox);
-            anomalousRoom = Room.List.FirstOrDefault(r => r.Type == RoomType.LczGlassBox);
+            anomalousRoom = room;
+
+            if (!Config.Events.AnomalousLocker.Enabled)
+                return;
+
             if (room == null)
             {
                 Log.Warn("GR-18 не найдена!");
-                return;
+                anomalousLocker = null;
             }
-
-            var lockers = Locker.List.Where(l => l.Room == room).ToList();
-
-            if (lockers.Count == 0)
+            else
             {
-                Log.Warn("В GR-18 нет шкафов!");
-                return;
+                var lockers = Locker.List
+                    .Where(l => l.Room != null && l.Room == room)
+                    .ToList();
+
+                anomalousLocker = lockers.Count == 0 ? null : lockers[rnd.Next(lockers.Count)];
             }
 
-            anomalousLocker = lockers[lockerRnd.Next(lockers.Count)];
-
-            Log.Info("Аномальный шкаф выбран!");
-
-
-
+            if (!Config.Events.Radiation.Enabled)
+                return;
 
             radiationRooms.Clear();
 
             var targetRooms = Room.List.Where(r =>
                 r.Type == RoomType.HczArmory ||
                 r.Type == RoomType.EzIntercom ||
-                r.Type == RoomType.LczToilets 
+                r.Type == RoomType.LczToilets
             ).ToList();
 
             foreach (var radRoom in targetRooms)
             {
-                if (rnd.Next(100) < 45)
+                if (rnd.Next(100) < Config.Events.Radiation.Chance)
                 {
                     radiationRooms.Add(radRoom);
                     radRoom.Color = Color.green;
-
-                    Log.Info($"[Radiation] Заражена комната: {radRoom.Type}");
                 }
             }
         }
@@ -165,48 +163,56 @@ namespace UN_Util
         {
             if (ev.Player == null || ev.InteractingLocker == null) return;
 
-            if (anomalousLocker == null || ev.InteractingLocker.Base != anomalousLocker.Base)
-                return;
+            if (anomalousLocker != null)
+            {
+                if (ev.InteractingLocker != anomalousLocker)
+                    return;
+            }
+            else
+            {
+                if (ev.Player.CurrentRoom != anomalousRoom)
+                    return;
+            }
 
             if (ev.Player.Role.Team == Team.SCPs)
                 return;
 
-            if (anomalousRoom == null) return;
+            var cfg = Config.Events.AnomalousLocker;
 
             int roll = lockerRnd.Next(100);
+            int current = 0;
 
             anomalousRoom.Color = Color.yellow;
+            Timing.CallDelayed(3f, () => anomalousRoom?.ResetColor());
 
-            Timing.CallDelayed(3f, () =>
+            if (roll < (current += cfg.SeveredHandsChance))
             {
-                if (anomalousRoom != null)
-                    anomalousRoom.ResetColor();
-            });
+                ev.Player.EnableEffect(EffectType.SeveredHands, cfg.SeveredHandsDuration);
+                ev.Player.ShowHint("Аномалия...");
+            }
+            else if (roll < (current += cfg.BlindChance))
+            {
+                ev.Player.EnableEffect(EffectType.Blinded, cfg.BlindDuration);
+                ev.Player.ShowHint("Аномалия...");
 
-            if (roll < 10)
-            {
-                ev.Player.EnableEffect(EffectType.SeveredHands, 10f);
-                ev.Player.ShowHint("Аномалия.. Руки оторваны", 3f);
             }
-            else if (roll < 20)
+            else if (roll < (current += cfg.EnsnaredChance))
             {
-                ev.Player.EnableEffect(EffectType.Blinded, 5f);
-                ev.Player.ShowHint("Аномалия.. Темнота", 3f);
+                ev.Player.EnableEffect(EffectType.Ensnared, cfg.EnsnaredDuration);
+                ev.Player.ShowHint("Аномалия...");
+
             }
-            else if (roll < 30)
+            else if (roll < (current += cfg.PoisonChance))
             {
-                ev.Player.EnableEffect(EffectType.Ensnared, 6f);
-                ev.Player.ShowHint("Аномалия.. Ты не можешь двигаться", 3f);
+                ev.Player.EnableEffect(EffectType.Poisoned, cfg.PoisonDuration);
+                ev.Player.ShowHint("Аномалия...");
+
             }
-            else if (roll < 40)
+            else if (roll < (current += cfg.SlowChance))
             {
-                ev.Player.EnableEffect(EffectType.Poisoned, 8f);
-                ev.Player.ShowHint("Аномалия.. Тебе плохо", 3f);
-            }
-            else if (roll < 50)
-            {
-                ev.Player.EnableEffect(EffectType.Slowness, 10f);
-                ev.Player.ShowHint("Аномалия.. Ты замедлен", 3f);
+                ev.Player.EnableEffect(EffectType.Slowness, cfg.SlowDuration);
+                ev.Player.ShowHint("Аномалия...");
+
             }
         }
 
@@ -254,30 +260,41 @@ namespace UN_Util
 
         private IEnumerator<float> RadiationLoop()
         {
+
             while (true)
             {
                 foreach (var player in Player.List)
                 {
+
+                    if (!Config.Events.Radiation.Enabled)
+                    {
+                        yield return Timing.WaitForSeconds(1f);
+                        continue;
+
+                    }
+
                     if (player == null || !player.IsAlive)
                         continue;
 
                     if (player.Role.Team == Team.SCPs)
-                        player.ShowHint("Эта комната зараженна радиацией! Но у тебя имунитет");
-                        continue;
-
-                    var room = player.CurrentRoom;
-
-                    if (room == null)
-                        continue;
-
-                    if (radiationRooms.Contains(room))
                     {
-                        player.EnableEffect(EffectType.Poisoned, 3f);
+                        if (radiationRooms.Contains(player.CurrentRoom))
+                            player.ShowHint("У тебя иммунитет к радиации", 1f);
+
+                        continue;
+                    }
+
+                    if (radiationRooms.Contains(player.CurrentRoom))
+                    {
+                        player.EnableEffect(
+                            EffectType.Poisoned,
+                            Config.Events.Radiation.Duration);
+
                         player.ShowHint("<color=green>Радиация!</color>", 1f);
                     }
                 }
 
-                yield return Timing.WaitForSeconds(2f);
+                yield return Timing.WaitForSeconds(Config.Events.Radiation.Interval);
             }
         }
 
@@ -457,10 +474,13 @@ namespace UN_Util
 
         private void OnRespawningTeam(RespawningTeamEventArgs ev)
         {
+            if (!Config.Events.Traitor.Enabled)
+                return;
+
             if (ev.Players == null || ev.Players.Count == 0)
                 return;
 
-            if (rnd.Next(100) > 40)
+            if (rnd.Next(100) > Config.Events.Traitor.SpawnChance)
                 return;
 
             traitorActive = false;
@@ -496,7 +516,7 @@ namespace UN_Util
 
         private IEnumerator<float> TraitorTimer()
         {
-            float time = 60f;
+            float time = Config.Events.Traitor.ActivationTime;
 
             while (time > 0)
             {
@@ -510,7 +530,6 @@ namespace UN_Util
             }
 
             traitorActive = true;
-
             traitor?.Broadcast(5, "<color=green>Ты активирован. Действуй.</color>");
         }
 
