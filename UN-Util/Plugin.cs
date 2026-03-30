@@ -24,7 +24,7 @@ namespace UN_Util
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 2, 0);
+        public override Version Version => new Version(0, 2, 1);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
@@ -117,24 +117,30 @@ namespace UN_Util
         private void OnMapGenerated()
         {
             var room = Room.List.FirstOrDefault(r => r.Type == RoomType.LczGlassBox);
-            anomalousRoom = Room.List.FirstOrDefault(r => r.Type == RoomType.LczGlassBox);
+            anomalousRoom = room;
+
             if (room == null)
             {
                 Log.Warn("GR-18 не найдена!");
-                return;
+                anomalousLocker = null;
             }
-
-            var lockers = Locker.List.Where(l => l.Room == room).ToList();
-
-            if (lockers.Count == 0)
+            else
             {
-                Log.Warn("В GR-18 нет шкафов!");
-                return;
+                var lockers = Locker.List
+                    .Where(l => l.Room != null && l.Room == room)
+                    .ToList();
+
+                if (lockers.Count == 0)
+                {
+                    Log.Warn("В GR-18 НЕТ шкафов → вся комната стала аномалией!");
+                    anomalousLocker = null; 
+                }
+                else
+                {
+                    anomalousLocker = lockers[rnd.Next(lockers.Count)];
+                    Log.Info($"Аномальный шкаф выбран! ({lockers.Count} шкафов)");
+                }
             }
-
-            anomalousLocker = lockers[lockerRnd.Next(lockers.Count)];
-
-            Log.Info("Аномальный шкаф выбран!");
 
 
 
@@ -165,8 +171,16 @@ namespace UN_Util
         {
             if (ev.Player == null || ev.InteractingLocker == null) return;
 
-            if (anomalousLocker == null || ev.InteractingLocker.Base != anomalousLocker.Base)
-                return;
+            if (anomalousLocker != null)
+            {
+                if (ev.InteractingLocker != anomalousLocker)
+                    return;
+            }
+            else
+            {
+                if (ev.Player.CurrentRoom != anomalousRoom)
+                    return;
+            }
 
             if (ev.Player.Role.Team == Team.SCPs)
                 return;
@@ -262,8 +276,12 @@ namespace UN_Util
                         continue;
 
                     if (player.Role.Team == Team.SCPs)
-                        player.ShowHint("Эта комната зараженна радиацией! Но у тебя имунитет");
+                    {
+                        if (radiationRooms.Contains(player.CurrentRoom))
+                            player.ShowHint("У тебя иммунитет к радиации", 1f);
+
                         continue;
+                    }
 
                     var room = player.CurrentRoom;
 
