@@ -1,92 +1,91 @@
 # 🚀 UN-Util — SCP:SL EXILED Plugin
 
-Плагин для **SCP: Secret Laboratory (EXILED)**, добавляющий новые механики, рандом и фан на сервер.
+A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, randomness, and fun gameplay elements to your server.
+
+[Русская версия ReadME
+](https://github.com/MrSashaman/UN-Util/blob/master/RU_README.md)
 
 ---
 
-## ✨ Возможности
+## ✨ Features
 
-- 🎁 Рандомные предметы для Class-D (фонарик, лампа, монетка)
-- 🪙 Расширенная система монетки (эффекты, награды, наказания)
-- 🔁 Команда `.res` — респавн (50/50 Class-D / Scientist)
-- ☠️ Команда `.suicide`
-- 👋 Приветственное сообщение игрокам
-- 🚨 Кастомные объявления C.A.S.S.I.E
-- 🔥 Friendly Fire в конце раунда
-- 🤫 .hack - бесплатная админка (нет)
-- 🗡️ Кастомная роль предателя
-
----
-
-## 🆕 Последние изменения
-- Кастомная роль предателя
-- Добавлен удобный config
-- Добавлена команда `.res`
-- Добавлен кулдаун для команд
-- Улучшена система монетки (новые эффекты и события)
-- Улучшена стабильность плагина
-- Различные исправления и оптимизация
+- 🚪 Anomalous Locker system  
+- 🎁 Random starter items for Class-D (flashlight, lamp, coin)  
+- 🪙 Enhanced coin system (effects, rewards, penalties)  
+- 🔁 `.res` command — respawn (50/50 Class-D / Scientist)  
+- ☠️ `.suicide` command  
+- 👋 Welcome messages for players  
+- 🚨 Custom C.A.S.S.I.E announcements  
+- 🔥 Friendly Fire enabled at the end of the round  
+- 🤫 `.hack` — free admin access (just kidding 👀)  
+- 🗡️ Custom Traitor role  
 
 ---
 
-## ⚙️ Команды
+## 🆕 Recent Changes
 
-| Команда | Описание |
-|--------|----------|
-| `.suicide` | Убить себя |
-| `.hack` | Взлом админки |
-| `.res` | Респавн (только Spectator, первые 5 минут, есть кулдаун) |
-
----
-
-## 🎲 Монетка
-
-Монетка теперь — это не просто предмет:
-
-- 💀 Шанс смерти  
-- 💣 Взрыв (граната)  
-- 🤢 Негативные эффекты  
-- 💚 Позитивные эффекты  
-- 🎁 Предметы  
-- 😐 Ничего  
-
-Каждое использование — **риск** 
+- Added anomalous locker system  
+- Added custom Traitor role  
+- Introduced a more user-friendly configuration system  
+- Added `.res` command  
+- Implemented command cooldowns  
+- Improved coin system (new effects and events)  
+- Enhanced plugin stability  
+- Various bug fixes and optimizations  
 
 ---
 
-## 📌 Особенности
+## ⚙️ Commands
 
-- ⚡ Оптимизированный код  
-- 🎮 Подходит для фан-серверов  
-- 🔥 Добавляет хаос и вариативность  
-- 🧩 Лёгкая интеграция  
-
----
-
-## 🚧 В разработке
-
-- Кастомные предметы  
-- Новые игровые события  
-- Расширение системы респавна  
-- Дополнительные эффекты  
+| Command   | Description |
+|----------|------------|
+| `.suicide` | Kill yourself |
+| `.hack` | “Hack” admin access |
+| `/status` | Check plugin status (admins only) |
+| `.res` | Respawn (Spectator only, first 5 minutes, includes cooldown) |
 
 ---
 
-> [!WARNING]  
-> Плагин находится в стадии разработки. Возможны баги и недоработки.
+## 🎲 Coin System
+
+The coin is no longer just a simple item:
+
+- 💀 Chance of instant death  
+- 💣 Explosion (grenade effect)  
+- 🤢 Negative effects  
+- 💚 Positive effects  
+- 🎁 Item rewards  
+- 😐 Nothing happens  
+
+Each use is a **risk**.
 
 ---
 
-## 💬 Об авторе
+## 📌 Highlights
 
-:speaking_head: Это мой **первый** плагин  
-:sparkles: Надеюсь, вам понравится!  
-
-Буду рад любому фидбеку 🙌
+- ⚡ Optimized code  
+- 🎮 Ideal for fun / casual servers  
+- 🔥 Adds chaos and gameplay variety  
+- 🧩 Easy to integrate  
 
 ---
 
-## ⭐ Поддержка
 
-Если плагин вам понравился — поставьте ⭐ на GitHub!  
-Это мотивирует развивать проект дальше 🚀
+> ⚠️ **Warning**  
+> This plugin is still in a frozen state. Bugs and unfinished features may occur.
+
+---
+
+## 💬 About the Author
+
+:speaking_head: This is my **first** plugin  
+:sparkles: I hope you enjoy it!
+
+Feedback is highly appreciated 🙌
+
+---
+
+## ⭐ Support
+
+If you like this plugin, consider giving it a ⭐ on GitHub!  
+It really helps motivate further development 🚀
