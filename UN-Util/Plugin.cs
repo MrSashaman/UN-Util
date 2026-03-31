@@ -23,7 +23,7 @@ namespace UN_Util
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 2, 0);
+        public override Version Version => new Version(0, 2, 2);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
