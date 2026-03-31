@@ -1,7 +1,9 @@
 # 🚀 UN-Util — SCP:SL EXILED Plugin
 
 A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, randomness, and fun gameplay elements to your server.
-
+----
+![Downloads](https://img.shields.io/github/downloads/MrSashaman/UN-Util/latest/total?style=for-the-badge)
+----
 [Русская версия ReadME
 ](https://github.com/MrSashaman/UN-Util/blob/master/RU_README.md)
 
