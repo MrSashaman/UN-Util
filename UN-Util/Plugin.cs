@@ -3,7 +3,6 @@ using Exiled.API.Features;
 using Exiled.API.Features.Items;
 using Exiled.API.Features.Lockers;
 using Exiled.Events.EventArgs.Map;
-using Exiled.Events.EventArgs.Map;
 using Exiled.Events.EventArgs.Player;
 using Exiled.Events.EventArgs.Scp049;
 using Exiled.Events.EventArgs.Scp096;
@@ -24,7 +23,7 @@ namespace UN_Util
         public override string Name => "UnitedUtil";
         public override string Prefix => "UN_Utils";
         public override string Author => "mrSashaman";
-        public override Version Version => new Version(0, 2, 2);
+        public override Version Version => new Version(0, 2, 0);
 
         private readonly System.Random rnd = new System.Random();
         private Dictionary<Player, CoroutineHandle> choosingPlayers = new Dictionary<Player, CoroutineHandle>();
@@ -104,7 +103,7 @@ namespace UN_Util
             Log.Info("  / / / / | / /   / / / /_  __/  _/ / ");
             Log.Info(" / / / /  |/ /   / / / / / /  / // /  ");
             Log.Info("/ /_/ / /|  /   / /_/ / / / _/ // /___");
-            Log.Info("\\____/_/ |_/____\\____/ /_/ /___/_____/");
+            Log.Info("\\____/_/ |_/____\\____/ /_/ /___/_____/\\");
             Log.Info("          /_____/                     ");
 
             Log.Info(" ");
@@ -116,24 +115,29 @@ namespace UN_Util
 
         private void OnMapGenerated()
         {
-            var room = Room.List.FirstOrDefault(r => r.Type == RoomType.LczGlassBox);
-            anomalousRoom = room;
+            anomalousRoom = Room.List.FirstOrDefault(r => r.Type == RoomType.LczGlassBox);
 
-            if (!Config.Events.AnomalousLocker.Enabled)
-                return;
-
-            if (room == null)
+            if (Config.Events.AnomalousLocker.Enabled)
             {
-                Log.Warn("GR-18 не найдена!");
-                anomalousLocker = null;
-            }
-            else
-            {
-                var lockers = Locker.List
-                    .Where(l => l.Room != null && l.Room == room)
-                    .ToList();
+                if (anomalousRoom == null)
+                {
+                    Log.Warn("GR-18 не найдена!");
+                    anomalousLocker = null;
+                }
+                else
+                {
+                    var lockers = Locker.List.Where(l => l.Room == anomalousRoom).ToList();
 
-                anomalousLocker = lockers.Count == 0 ? null : lockers[rnd.Next(lockers.Count)];
+                    if (lockers.Count == 0)
+                    {
+                        Log.Warn("Нет шкафов → вся комната аномалия");
+                        anomalousLocker = null;
+                    }
+                    else
+                    {
+                        anomalousLocker = lockers[lockerRnd.Next(lockers.Count)];
+                    }
+                }
             }
 
             if (!Config.Events.Radiation.Enabled)
@@ -145,14 +149,14 @@ namespace UN_Util
                 r.Type == RoomType.HczArmory ||
                 r.Type == RoomType.EzIntercom ||
                 r.Type == RoomType.LczToilets
-            ).ToList();
+            );
 
-            foreach (var radRoom in targetRooms)
+            foreach (var room in targetRooms)
             {
                 if (rnd.Next(100) < Config.Events.Radiation.Chance)
                 {
-                    radiationRooms.Add(radRoom);
-                    radRoom.Color = Color.green;
+                    radiationRooms.Add(room);
+                    room.Color = Color.green;
                 }
             }
         }
@@ -161,7 +165,11 @@ namespace UN_Util
 
         private void OnInteractingLocker(InteractingLockerEventArgs ev)
         {
-            if (ev.Player == null || ev.InteractingLocker == null) return;
+            if (!Config.Events.AnomalousLocker.Enabled)
+                return;
+
+            if (ev.Player == null || ev.InteractingLocker == null)
+                return;
 
             if (anomalousLocker != null)
             {
@@ -170,7 +178,7 @@ namespace UN_Util
             }
             else
             {
-                if (ev.Player.CurrentRoom != anomalousRoom)
+                if (anomalousRoom == null || ev.Player.CurrentRoom != anomalousRoom)
                     return;
             }
 
@@ -182,38 +190,24 @@ namespace UN_Util
             int roll = lockerRnd.Next(100);
             int current = 0;
 
-            anomalousRoom.Color = Color.yellow;
-            Timing.CallDelayed(3f, () => anomalousRoom?.ResetColor());
+            if (anomalousRoom != null)
+            {
+                anomalousRoom.Color = Color.yellow;
+                Timing.CallDelayed(3f, () => anomalousRoom?.ResetColor());
+            }
 
             if (roll < (current += cfg.SeveredHandsChance))
-            {
                 ev.Player.EnableEffect(EffectType.SeveredHands, cfg.SeveredHandsDuration);
-                ev.Player.ShowHint("Аномалия...");
-            }
             else if (roll < (current += cfg.BlindChance))
-            {
                 ev.Player.EnableEffect(EffectType.Blinded, cfg.BlindDuration);
-                ev.Player.ShowHint("Аномалия...");
-
-            }
             else if (roll < (current += cfg.EnsnaredChance))
-            {
                 ev.Player.EnableEffect(EffectType.Ensnared, cfg.EnsnaredDuration);
-                ev.Player.ShowHint("Аномалия...");
-
-            }
             else if (roll < (current += cfg.PoisonChance))
-            {
                 ev.Player.EnableEffect(EffectType.Poisoned, cfg.PoisonDuration);
-                ev.Player.ShowHint("Аномалия...");
-
-            }
             else if (roll < (current += cfg.SlowChance))
-            {
                 ev.Player.EnableEffect(EffectType.Slowness, cfg.SlowDuration);
-                ev.Player.ShowHint("Аномалия...");
 
-            }
+            ev.Player.ShowHint("Аномалия...");
         }
 
         private void PlayerVerified(VerifiedEventArgs ev)
@@ -260,19 +254,16 @@ namespace UN_Util
 
         private IEnumerator<float> RadiationLoop()
         {
-
             while (true)
             {
+                if (!Config.Events.Radiation.Enabled)
+                {
+                    yield return Timing.WaitForSeconds(1f);
+                    continue;
+                }
+
                 foreach (var player in Player.List)
                 {
-
-                    if (!Config.Events.Radiation.Enabled)
-                    {
-                        yield return Timing.WaitForSeconds(1f);
-                        continue;
-
-                    }
-
                     if (player == null || !player.IsAlive)
                         continue;
 
@@ -280,9 +271,11 @@ namespace UN_Util
                     {
                         if (radiationRooms.Contains(player.CurrentRoom))
                             player.ShowHint("У тебя иммунитет к радиации", 1f);
-
                         continue;
                     }
+
+                    if (player.CurrentRoom == null)
+                        continue;
 
                     if (radiationRooms.Contains(player.CurrentRoom))
                     {
@@ -297,6 +290,7 @@ namespace UN_Util
                 yield return Timing.WaitForSeconds(Config.Events.Radiation.Interval);
             }
         }
+        
 
         private void OnEscaping(EscapingEventArgs ev)
         {
