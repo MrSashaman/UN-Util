@@ -3,6 +3,9 @@
 A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, randomness, and fun gameplay elements to your server.
 ----
 ![Downloads](https://img.shields.io/github/downloads/MrSashaman/UN-Util/latest/total?style=for-the-badge)
+![GitHub License](https://img.shields.io/github/license/MrSashaman/UN-Util?style=for-the-badge)
+![GitHub Release](https://img.shields.io/github/v/release/MrSashaman/UN-Util?style=for-the-badge)
+
 ----
 [Русская версия ReadME
 ](https://github.com/MrSashaman/UN-Util/blob/master/RU_README.md)
