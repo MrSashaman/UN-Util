@@ -7,7 +7,7 @@ A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, 
 ![GitHub Release](https://img.shields.io/github/v/release/MrSashaman/UN-Util?style=for-the-badge)
 
 ----
-[Русская версия ReadME
+[🪆Русская версия Readme
 ](https://github.com/MrSashaman/UN-Util/blob/master/RU_README.md)
 
 ---
@@ -76,7 +76,7 @@ Each use is a **risk**.
 ---
 
 
-> ⚠️ **Warning**  
+> [!WARNING]  
 > This plugin is still in a frozen state. Bugs and unfinished features may occur.
 
 ---
