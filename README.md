@@ -12,7 +12,7 @@ A plugin for **SCP: Secret Laboratory (EXILED)** that introduces new mechanics, 
 
 ---
 
-## ✨ Features
+## ✨ Features:
 
 - 🚪 Anomalous Locker system  
 - 🎁 Random starter items for Class-D (flashlight, lamp, coin)  
